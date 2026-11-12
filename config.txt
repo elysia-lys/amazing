@@ -1,0 +1,13 @@
+# Maze dimensions
+WIDTH=20
+HEIGHT=15
+
+# Entry and exit coordinates
+ENTRY=0,0
+EXIT=19,14
+
+# Output settings
+OUTPUT_FILE=maze.txt
+
+# Maze type
+PERFECT=True
