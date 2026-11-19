@@ -121,10 +121,59 @@ def count_deadends(maze, width, height):
 
     return list_deadends
 
+
+def has_open_3x3(maze, width, height):
+    for row in range(height - 2):
+        for col in range(width - 2):
+            fully_open = True
+
+            for r in range(row, row + 3):
+                for c in range(col, col + 2):
+                    if maze[r][c]["E"] == 1:
+                        fully_open = False
+
+            for r in range(row, row + 2):
+                for c in range(col, col + 3):
+                    if maze[r][c]["S"] == 1:
+                        fully_open = False
+
+            if fully_open:
+                return True
+
+    return False
+
+
+def get_logo_cells(width, height):
+    if width < 7 or height < 5:
+        raise ValueError("Error: Maze is too small to fit 42 pattern")
+    pattern = [
+        "#...###",
+        "#.....#",
+        "###.###",
+        "..#.#..",
+        "..#.###"
+    ]
+
+    start_x = (width - 7) // 2
+    start_y = (height - 5) // 2
+
+    logo_cells = []
+
+    for y in range(5):
+        for x in range(7):
+            if pattern[y][x] == "#":
+                logo_cells.append((start_x + x, start_y + y))
+
+    return logo_cells
+
 def generate_perfect_maze(width, height):
     maze = create_maze(width, height)
     visited = visited_creation(width, height)
     stack = []
+
+    logo_cells = get_logo_cells(width, height)
+    for x, y in logo_cells:
+        visited[y][x] = True
 
     x = 0
     y = 0
@@ -157,7 +206,7 @@ def generate_perfect_maze(width, height):
 
 def generate_imperfect_maze(width, height):
     maze = generate_perfect_maze(width, height)
-
+    logo_cells = get_logo_cells(width, height)
     corners = [
         (0, 0),
         (width - 1, 0),
@@ -172,6 +221,9 @@ def generate_imperfect_maze(width, height):
 
     # Ensure corners and center have at least 2 connections
     for x, y in important_cells:
+        if (x, y) in logo_cells:
+            continue
+
         connections = 0
 
         for direction in ["N", "E", "S", "W"]:
@@ -189,8 +241,6 @@ def generate_imperfect_maze(width, height):
                 if connections == 2:
                     break
 
-        print((x, y), "connections:", connections)
-
     # Open random walls
     for y in range(height):
         for x in range(width):
@@ -201,68 +251,58 @@ def generate_imperfect_maze(width, height):
                     if random.choice([True, False]):
                         open_wall(maze, x, y, direction)
 
-                        # Check for a fully open 3x3 area
-                        open_area = False
-
-                        for row in range(height - 2):
-                            for col in range(width - 2):
-                                fully_open = True
-
-                                for r in range(row, row + 3):
-                                    for c in range(col, col + 2):
-                                        if maze[r][c]["E"] == 1:
-                                            fully_open = False
-
-                                for r in range(row, row + 2):
-                                    for c in range(col, col + 3):
-                                        if maze[r][c]["S"] == 1:
-                                            fully_open = False
-
-                                if fully_open:
-                                    open_area = True
-
-                        if open_area:
+                        # Check for a fully open 3pen = False
+                        if has_open_3x3(maze, width, height):
                             close_wall(maze, x, y, direction)
                         else:
                             opened += 1
 
-    # check for deadends
+    # Remove deadends
     dead_ends = count_deadends(maze, width, height)
-    print("before_deadends:",dead_ends)
-    for x, y in dead_ends:
+    for dead_x, dead_y in dead_ends:
         closed_walls = []
-        neighbors = get_neighbors(x, y, width, height)
+        neighbors = get_neighbors(dead_x, dead_y, width, height)
+
         for direction in neighbors:
-            if maze[y][x][direction] == 1:
+            if maze[dead_y][dead_x][direction] == 1:
                 closed_walls.append(direction)
+
         if closed_walls:
             direction = random.choice(closed_walls)
-            open_wall(maze, x, y, direction)
+            open_wall(maze, dead_x, dead_y, direction)
 
-    dead_ends = count_deadends(maze, width, height)
-
-    # Count total connections
-    total_connections = 0
-
-    for y in range(height):
-        for x in range(width):
-            if maze[y][x]["E"] == 0:
-                total_connections += 1
-            if maze[y][x]["S"] == 0:
-                total_connections += 1
-
-    print("Total connections:", total_connections)
-    print("Extra connections:", total_connections - (width * height - 1))
-    print("after_deadends:",dead_ends)
-    print("deadends:", len(count_deadends(maze, width, height)))
+            if has_open_3x3(maze, width, height):
+                close_wall(maze, dead_x, dead_y, direction)
 
     return maze
 
+#for debudding
+def print_maze(maze, width, height):
+
+    for y in range(height):
+        # Print north walls
+        for x in range(width):
+            print("+---" if maze[y][x]["N"] == 1 else "+   ", end="")
+        print("+")
+
+        # Print west and east walls
+        for x in range(width):
+            if all(maze[y][x][d] == 1 for d in ("N", "E", "S", "W")):
+                print("| # ", end="")
+            else:
+                print("|   " if maze[y][x]["W"] == 1 else "    ", end="")
+        print("|" if maze[y][width - 1]["E"] == 1 else " ")
+
+    # Print bottom walls
+    for x in range(width):
+        print("+---" if maze[height - 1][x]["S"] == 1 else "+   ", end="")
+    print("+")
+
 
 if __name__ == "__main__":
-    maze = generate_imperfect_maze(10, 10)
+    try:
+        maze = generate_imperfect_maze(10, 10)
+        print_maze(maze, 10, 10)
+    except ValueError as e:
+        print(e)
 
-    for row in maze:
-        for cell in row:
-            print(cell, end=" ")
-        print()
