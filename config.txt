@@ -1,13 +1,15 @@
 # Maze dimensions
-WIDTH=20
-HEIGHT=15
+WIDTH=6
+HEIGHT=4
 
 # Entry and exit coordinates
 ENTRY=0,0
-EXIT=19,14
+EXIT=1,2
 
 # Output settings
 OUTPUT_FILE=maze.txt
 
 # Maze type
-PERFECT=True
+PERFECT=true
+
+SEED=42

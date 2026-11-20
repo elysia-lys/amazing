@@ -1,4 +1,16 @@
+from config import read_config, convert_config, error_handling
+from generate_maze import generate_perfect_maze, generate_imperfect_maze, print_maze
+
+
 def main():
+    try:
+        config = read_config("config.txt")
+        convert_config(config)
+        error_handling(config)
+    except (ValueError, KeyError) as e:
+        print("Configuration error:", e)
+        return
+
     print("=== Welcome to A-Maze-Ing===")
     print("Please Select A Mode:")
 
@@ -13,6 +25,21 @@ def main():
             )
     if choice == 1:
         print("=== Generating Maze ===")
+        try:
+            if config["PERFECT"]:
+                maze = generate_perfect_maze(
+                    config["WIDTH"],
+                    config["HEIGHT"]
+                )
+            else:
+                maze = generate_imperfect_maze(
+                    config["WIDTH"],
+                    config["HEIGHT"]
+                )
+            print_maze(maze, config["WIDTH"], config["HEIGHT"])
+        except ValueError as e:
+            print("Generation error:", e)
+
     elif choice == 2:
         print("=== Solving Maze ===")
     elif choice == 3:

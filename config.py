@@ -12,8 +12,8 @@ def read_config(filename):
             config[key] = value
 
     required_keys = [
-            "WIDTH", "HEIGHT", "ENTRY"
-            "EXIT", "OUTPUT_FILE", "PERFECT"
+            "WIDTH", "HEIGHT", "ENTRY",
+            "EXIT", "OUTPUT_FILE", "PERFECT", "SEED"
             ]
 
     for key in required_keys:
@@ -35,6 +35,8 @@ def convert_config(config):
     config["EXIT"] = (int(a), int(b))
 
     config["PERFECT"] = config["PERFECT"].lower() == "true"
+
+    config["SEED"] = int(config["SEED"]) if "SEED" in config else None
 
     return config
 
@@ -64,27 +66,7 @@ def error_handling(config):
     if not config["OUTPUT_FILE"].endswith(".txt"):
         raise ValueError("Invalid file")
 
+    if config["SEED"] is not None and not isinstance(config["SEED"], int):
+        raise ValueError("Seed must be an integer")
 
-if __name__ == "__main__":
-    print("=== Maze config ===")
-    print("=== Getting config from config.txt ===")
-
-    try:
-        config = read_config("config.txt")
-
-        if config["PERFECT"].lower() not in ("true", "false"):
-            raise ValueError("PERFECT must be in True or False")
-
-        convert_config(config)
-
-        error_handling(config)
-
-        print(config["WIDTH"])
-        print(config["HEIGHT"])
-        print(config["ENTRY"])
-        print(config["EXIT"])
-        print(config["OUTPUT_FILE"])
-        print(config["PERFECT"])
-
-    except ValueError as error:
-        print(error)
+    print(config)

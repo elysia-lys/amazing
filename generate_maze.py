@@ -1,5 +1,6 @@
 import random
 
+
 def create_maze(width, height):
     maze = []
 
@@ -145,7 +146,8 @@ def has_open_3x3(maze, width, height):
 
 def get_logo_cells(width, height):
     if width < 7 or height < 5:
-        raise ValueError("Error: Maze is too small to fit 42 pattern")
+        print("Error: Maze is too small to fit 42 pattern")
+        return []
     pattern = [
         "#...###",
         "#.....#",
@@ -166,12 +168,14 @@ def get_logo_cells(width, height):
 
     return logo_cells
 
-def generate_perfect_maze(width, height):
+
+def generate_perfect_maze(width, height, logo_cells=None):
     maze = create_maze(width, height)
     visited = visited_creation(width, height)
     stack = []
 
-    logo_cells = get_logo_cells(width, height)
+    if logo_cells is None:
+        logo_cells = get_logo_cells(width, height)
     for x, y in logo_cells:
         visited[y][x] = True
 
@@ -205,8 +209,8 @@ def generate_perfect_maze(width, height):
 
 
 def generate_imperfect_maze(width, height):
-    maze = generate_perfect_maze(width, height)
     logo_cells = get_logo_cells(width, height)
+    maze = generate_perfect_maze(width, height, logo_cells)
     corners = [
         (0, 0),
         (width - 1, 0),
@@ -234,6 +238,19 @@ def generate_imperfect_maze(width, height):
             neighbors = get_neighbors(x, y, width, height)
 
             for direction in neighbors:
+                nx, ny = x, y
+                if direction == "E":
+                    nx += 1
+                elif direction == "W":
+                    nx -= 1
+                elif direction == "N":
+                    ny -= 1
+                elif direction == "S":
+                    ny += 1
+
+                if (nx, ny) in logo_cells:
+                    continue
+
                 if maze[y][x][direction] == 1:
                     open_wall(maze, x, y, direction)
                     connections += 1
@@ -244,14 +261,28 @@ def generate_imperfect_maze(width, height):
     # Open random walls
     for y in range(height):
         for x in range(width):
+            if (x, y) in logo_cells:
+                continue
             neighbors = get_neighbors(x, y, width, height)
 
             for direction in neighbors:
+                if direction == "E":
+                    nx, ny = x + 1, y
+                elif direction == "W":
+                    nx, ny = x - 1, y
+                elif direction == "N":
+                    nx, ny = x, y - 1
+                elif direction == "S":
+                    nx, ny = x, y + 1
+
+                if (nx, ny) in logo_cells:
+                    continue
+
                 if maze[y][x][direction] == 1 and opened < extra_walls:
                     if random.choice([True, False]):
                         open_wall(maze, x, y, direction)
 
-                        # Check for a fully open 3pen = False
+                        # Check for a fully open 3x3 area
                         if has_open_3x3(maze, width, height):
                             close_wall(maze, x, y, direction)
                         else:
@@ -264,6 +295,20 @@ def generate_imperfect_maze(width, height):
         neighbors = get_neighbors(dead_x, dead_y, width, height)
 
         for direction in neighbors:
+            nx, ny = dead_x, dead_y
+
+            if direction == "E":
+                nx += 1
+            elif direction == "W":
+                nx -= 1
+            elif direction == "N":
+                ny -= 1
+            elif direction == "S":
+                ny += 1
+
+            if (nx, ny) in logo_cells:
+                continue
+
             if maze[dead_y][dead_x][direction] == 1:
                 closed_walls.append(direction)
 
@@ -276,7 +321,8 @@ def generate_imperfect_maze(width, height):
 
     return maze
 
-#for debudding
+
+# for debudding
 def print_maze(maze, width, height):
 
     for y in range(height):
@@ -301,8 +347,7 @@ def print_maze(maze, width, height):
 
 if __name__ == "__main__":
     try:
-        maze = generate_imperfect_maze(10, 10)
-        print_maze(maze, 10, 10)
+        maze = generate_perfect_maze(7, 5)
+        print_maze(maze, 7, 5)
     except ValueError as e:
         print(e)
-
