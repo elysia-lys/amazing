@@ -20,6 +20,29 @@ def create_maze(width, height):
     return maze
 
 
+def open_entrance_exit(maze, entry, exit, width, height):
+    entry_x, entry_y = entry
+    exit_x, exit_y = exit
+
+    if entry_x == 0:
+        maze[entry_y][entry_x]["W"] = 0
+    elif entry_x == width - 1:
+        maze[entry_y][entry_x]["E"] = 0
+    elif entry_y == 0:
+        maze[entry_y][entry_x]["N"] = 0
+    elif entry_y == height - 1:
+        maze[entry_y][entry_x]["S"] = 0
+
+    if exit_x == 0:
+        maze[exit_y][exit_x]["W"] = 0
+    elif exit_x == width - 1:
+        maze[exit_y][exit_x]["E"] = 0
+    elif exit_y == 0:
+        maze[exit_y][exit_x]["N"] = 0
+    elif exit_y == height - 1:
+        maze[exit_y][exit_x]["S"] = 0
+
+
 def open_wall(maze, x, y, direction):
     if direction == "E":
         maze[y][x]["E"] = 0
@@ -169,7 +192,7 @@ def get_logo_cells(width, height):
     return logo_cells
 
 
-def generate_perfect_maze(width, height, logo_cells=None):
+def generate_perfect_maze(width, height, entry, exit, logo_cells=None):
     maze = create_maze(width, height)
     visited = visited_creation(width, height)
     stack = []
@@ -205,12 +228,14 @@ def generate_perfect_maze(width, height, logo_cells=None):
             x, y = stack.pop()
 
         visited[y][x] = True
+    
+    open_entrance_exit(maze, entry, exit, width, height)
     return maze
 
 
-def generate_imperfect_maze(width, height):
+def generate_imperfect_maze(width, height, entry, exit):
     logo_cells = get_logo_cells(width, height)
-    maze = generate_perfect_maze(width, height, logo_cells)
+    maze = generate_perfect_maze(width, height, entry, exit, logo_cells)
     corners = [
         (0, 0),
         (width - 1, 0),

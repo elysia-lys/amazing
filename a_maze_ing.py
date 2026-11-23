@@ -29,12 +29,16 @@ def main():
             if config["PERFECT"]:
                 maze = generate_perfect_maze(
                     config["WIDTH"],
-                    config["HEIGHT"]
+                    config["HEIGHT"],
+                    config["ENTRY"],
+                    config["EXIT"]
                 )
             else:
                 maze = generate_imperfect_maze(
                     config["WIDTH"],
-                    config["HEIGHT"]
+                    config["HEIGHT"],
+                    config["ENTRY"],
+                    config["EXIT"]
                 )
             print_maze(maze, config["WIDTH"], config["HEIGHT"])
         except ValueError as e:

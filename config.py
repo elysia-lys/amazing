@@ -53,12 +53,18 @@ def error_handling(config):
         raise ValueError("Invalid x entry")
     if y >= config["HEIGHT"] or y < 0:
         raise ValueError("Invalid y entry")
+    if x != 0 and x != config["WIDTH"] - 1 \
+        and y != 0 and y != config["HEIGHT"] - 1:
+        raise ValueError("Entry must be on the maze boundary")
 
     a, b = config["EXIT"]
     if a >= config["WIDTH"] or a < 0:
         raise ValueError("Invalid x exit")
     if b >= config["HEIGHT"] or b < 0:
         raise ValueError("Invalid y exit")
+    if a != 0 and a != config["WIDTH"] - 1 \
+        and b != 0 and b != config["HEIGHT"] - 1:
+        raise ValueError("Exit must be on the maze boundary")
 
     if config["ENTRY"] == config["EXIT"]:
         raise ValueError("Entry and Exit cannot be the same")
