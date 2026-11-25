@@ -184,14 +184,10 @@ correctly than originally planned.
 
 | Tool | Purpose |
 |---|---|
-| Python | Main programming language |
-| Git | Version control |
-| Neovim | Code editor |
 | Flake8 | Code style checking |
 | Mypy | Static type checking |
 | pip | Dependency management |
 | Python Build | Package distribution |
-| ChatGPT | Learning, debugging and development assistance |
 
 ## 7. Resources
 
