@@ -4,7 +4,7 @@ from generate_maze import MazeGenerator
 import sys
 
 
-def main():
+def main() -> None:
     if len(sys.argv) != 2:
         print("Usage: python3 a_maze_ing.py <config_file>")
         return
@@ -18,23 +18,19 @@ def main():
 
     print("=== Generating Maze ===")
     try:
+        generator = MazeGenerator(
+            config["WIDTH"],
+            config["HEIGHT"],
+            config["ENTRY"],
+            config["EXIT"],
+            config["PERFECT"],
+            config["SEED"]
+        )
         if config["PERFECT"]:
-            maze = generate_perfect_maze(
-                config["WIDTH"],
-                config["HEIGHT"],
-                config["ENTRY"],
-                config["EXIT"],
-                seed=config["SEED"]
-            )
+            generator.generate_perfect_maze()
         else:
-            maze = generate_imperfect_maze(
-                config["WIDTH"],
-                config["HEIGHT"],
-                config["ENTRY"],
-                config["EXIT"],
-                seed=config["SEED"]
-            )
-        print_maze(maze, config["WIDTH"], config["HEIGHT"])
+            generator.generate_imperfect_maze()
+        generator.print_maze()
     except ValueError as e:
         print("Generation error:", e)
 
@@ -64,6 +60,7 @@ def main():
     elif answer == 4:
         print("=== Quit ===")
         return
+
 
 if __name__ == "__main__":
     main()

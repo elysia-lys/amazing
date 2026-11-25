@@ -1,5 +1,8 @@
-def read_config(filename):
-    config = {}
+from typing import Any
+
+
+def read_config(filename: str) -> dict[str, Any]:
+    config: dict[str, Any] = {}
 
     with open(filename, "r") as file:
         content = file.read()
@@ -23,7 +26,7 @@ def read_config(filename):
     return config
 
 
-def convert_config(config):
+def convert_config(config: dict[str, Any]) -> dict[str, Any]:
 
     config["WIDTH"] = int(config["WIDTH"])
     config["HEIGHT"] = int(config["HEIGHT"])
@@ -41,7 +44,7 @@ def convert_config(config):
     return config
 
 
-def error_handling(config):
+def error_handling(config: dict[str, Any]) -> None:
 
     if config["WIDTH"] <= 0:
         raise ValueError("Invalid Width size")

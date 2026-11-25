@@ -192,7 +192,10 @@ def get_logo_cells(width, height):
     return logo_cells
 
 
-def generate_perfect_maze(width, height, entry, exit, logo_cells=None, seed=None):
+def generate_perfect_maze(
+        width, height, entry, exit,
+        logo_cells=None, seed=None
+        ):
     random.seed(seed)
     maze = create_maze(width, height)
     visited = visited_creation(width, height)
@@ -236,7 +239,10 @@ def generate_perfect_maze(width, height, entry, exit, logo_cells=None, seed=None
 
 def generate_imperfect_maze(width, height, entry, exit, seed=None):
     logo_cells = get_logo_cells(width, height)
-    maze = generate_perfect_maze(width, height, entry, exit, logo_cells=logo_cells, seed=seed)
+    maze = generate_perfect_maze(
+            width, height, entry,
+            exit, logo_cells=logo_cells, seed=seed
+            )
     corners = [
         (0, 0),
         (width - 1, 0),

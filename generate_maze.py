@@ -2,8 +2,12 @@ import random
 
 
 class MazeGenerator:
-    def __init__(self, width, height, entry, exit, perfect, seed):
-        self.maze = None
+    def __init__(
+            self, width: int, height: int,
+            entry: tuple[int, int], exit: tuple[int, int],
+            perfect: bool, seed: int
+            ) -> None:
+        self.maze: list[list[dict[str, int]]] = []
         self.width = width
         self.height = height
         self.entry = entry
@@ -11,7 +15,7 @@ class MazeGenerator:
         self.perfect = perfect
         self.seed = seed
 
-    def create_maze(self):
+    def create_maze(self) -> list[list[dict[str, int]]]:
         self.maze = []
 
         for y in range(self.height):
@@ -26,7 +30,7 @@ class MazeGenerator:
             self.maze.append(row)
         return self.maze
 
-    def open_entrance_exit(self):
+    def open_entrance_exit(self) -> None:
         entry_x, entry_y = self.entry
         exit_x, exit_y = self.exit
 
@@ -48,8 +52,7 @@ class MazeGenerator:
         elif exit_y == self.height - 1:
             self.maze[exit_y][exit_x]["S"] = 0
 
-
-    def open_wall(self, x, y, direction):
+    def open_wall(self, x: int, y: int, direction: str) -> None:
         if direction == "E":
             self.maze[y][x]["E"] = 0
             self.maze[y][x + 1]["W"] = 0
@@ -63,8 +66,7 @@ class MazeGenerator:
             self.maze[y][x]["S"] = 0
             self.maze[y + 1][x]["N"] = 0
 
-
-    def close_wall(self, x, y, direction):
+    def close_wall(self, x: int, y: int, direction: str) -> None:
         if direction == "E":
             self.maze[y][x]["E"] = 1
             self.maze[y][x + 1]["W"] = 1
@@ -78,8 +80,7 @@ class MazeGenerator:
             self.maze[y][x]["S"] = 1
             self.maze[y + 1][x]["N"] = 1
 
-
-    def get_neighbors(self, x, y):
+    def get_neighbors(self, x: int, y: int) -> list[str]:
         neighbors = []
 
         if x < self.width - 1:
@@ -96,8 +97,7 @@ class MazeGenerator:
 
         return neighbors
 
-
-    def visited_creation(self):
+    def visited_creation(self) -> list[list[bool]]:
         visited = []
 
         for y in range(self.height):
@@ -109,7 +109,10 @@ class MazeGenerator:
 
         return visited
 
-    def get_unvisited_neighbors(self, x, y, visited):
+    def get_unvisited_neighbors(
+            self, x: int, y: int,
+            visited: list[list[bool]]
+            ) -> list[str]:
         neighbors = self.get_neighbors(x, y)
         unvisited = []
 
@@ -129,8 +132,9 @@ class MazeGenerator:
 
         return unvisited
 
-    
-    def count_deadends(self, logo_cells):
+    def count_deadends(
+            self, logo_cells: list[tuple[int, int]]
+            ) -> list[tuple[int, int]]:
         list_deadends = []
 
         for y in range(self.height):
@@ -152,8 +156,7 @@ class MazeGenerator:
 
         return list_deadends
 
-
-    def has_open_3x3(self):
+    def has_open_3x3(self) -> bool:
         for row in range(self.height - 2):
             for col in range(self.width - 2):
                 fully_open = True
@@ -173,7 +176,7 @@ class MazeGenerator:
 
         return False
 
-    def get_logo_cells(self):
+    def get_logo_cells(self) -> list[tuple[int, int]]:
         if self.width < 7 or self.height < 5:
             print("Error: Maze is too small to fit 42 pattern")
             return []
@@ -197,8 +200,10 @@ class MazeGenerator:
 
         return logo_cells
 
-
-    def generate_perfect_maze(self, logo_cells=None):
+    def generate_perfect_maze(
+            self,
+            logo_cells: list[tuple[int, int]] | None = None
+            ) -> list[list[dict[str, int]]]:
         random.seed(self.seed)
         self.maze = self.create_maze()
         visited = self.visited_creation()
@@ -239,8 +244,7 @@ class MazeGenerator:
         self.open_entrance_exit()
         return self.maze
 
-    
-    def generate_imperfect_maze(self):
+    def generate_imperfect_maze(self) -> list[list[dict[str, int]]]:
         logo_cells = self.get_logo_cells()
         self.maze = self.generate_perfect_maze(logo_cells=logo_cells)
         corners = [
@@ -310,7 +314,10 @@ class MazeGenerator:
                     if (nx, ny) in logo_cells:
                         continue
 
-                    if self.maze[y][x][direction] == 1 and opened < extra_walls:
+                    if (
+                            self.maze[y][x][direction] == 1
+                            and opened < extra_walls
+                            ):
                         if random.choice([True, False]):
                             self.open_wall(x, y, direction)
 
@@ -353,14 +360,30 @@ class MazeGenerator:
 
         return self.maze
 
-if __name__ == "__main__":
-    generator = MazeGenerator(10, 10, (0, 0), (9, 9), False, 42)
+    # for debudding
+    def print_maze(self) -> None:
 
-    maze = generator.generate_imperfect_maze()
-    print(maze[0][0])
-    print(maze[9][9])
-    print(len(maze))
-    print(len(maze[0]))
-    logo_cells = generator.get_logo_cells()
-    print("Logo cells:", logo_cells)
-    print("Dead ends:", generator.count_deadends(logo_cells))
+        for y in range(self.height):
+            # Print north walls
+            for x in range(self.width):
+                print("+---" if self.maze[y][x]["N"] == 1 else "+   ", end="")
+            print("+")
+
+            # Print west and east walls
+            for x in range(self.width):
+                if all(self.maze[y][x][d] == 1 for d in ("N", "E", "S", "W")):
+                    print("| # ", end="")
+                else:
+                    print(
+                            "|   " if self.maze[y][x]["W"] == 1
+                            else "    ", end=""
+                            )
+            print("|" if self.maze[y][self.width - 1]["E"] == 1 else " ")
+
+        # Print bottom walls
+        for x in range(self.width):
+            print(
+                    "+---" if self.maze[self.height - 1][x]["S"] == 1
+                    else "+   ", end=""
+                    )
+        print("+")
