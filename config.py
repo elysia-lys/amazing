@@ -39,7 +39,11 @@ def convert_config(config: dict[str, Any]) -> dict[str, Any]:
 
     config["PERFECT"] = config["PERFECT"].lower() == "true"
 
-    config["SEED"] = int(config["SEED"]) if "SEED" in config else None
+    config["SEED"] = (
+            int(config["SEED"])
+            if config.get("SEED")
+            in config else None
+            )
 
     return config
 

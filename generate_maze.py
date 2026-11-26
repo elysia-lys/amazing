@@ -329,6 +329,7 @@ class MazeGenerator:
 
         # Remove deadends
         dead_ends = self.count_deadends(logo_cells)
+
         for dead_x, dead_y in dead_ends:
             closed_walls = []
             neighbors = self.get_neighbors(dead_x, dead_y)
@@ -350,14 +351,19 @@ class MazeGenerator:
 
                 if self.maze[dead_y][dead_x][direction] == 1:
                     closed_walls.append(direction)
+            print(f"\nDead end: {(dead_x, dead_y)}")
+            print("Available walls:", closed_walls)
+            random.shuffle(closed_walls)
 
-            if closed_walls:
-                direction = random.choice(closed_walls)
+            for direction in closed_walls:
                 self.open_wall(dead_x, dead_y, direction)
 
-                if self.has_open_3x3():
-                    self.close_wall(dead_x, dead_y, direction)
+                if not self.has_open_3x3():
+                    break
 
+                self.close_wall(dead_x, dead_y, direction)
+        print("Remaining dead ends:", self.count_deadends(logo_cells))
+        print("Has open 3x3:", self.has_open_3x3())
         return self.maze
 
     # for debudding

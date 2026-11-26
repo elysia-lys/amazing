@@ -10,6 +10,6 @@ EXIT=9,9
 OUTPUT_FILE=maze.txt
 
 # Maze type
-PERFECT=true
+PERFECT=false
 
-SEED=42
+SEED=
